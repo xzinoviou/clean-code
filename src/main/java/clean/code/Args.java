@@ -55,4 +55,93 @@ public class Args {
         return true;
     }
 
+    private void parseSchemaElement(String element) throws ParseException {
+
+        char elementId = element.charAt(0);
+        String elementTail = element.substring(1);
+
+        validateSchemaElementId(elementId);
+
+        if (isBooleanSchemaElement(elementTail)) {
+            parseBooleanSchemaElement(elementId);
+        } else if (isStringSchemaElement(elementTail)) {
+            parseStringSchemaElement(elementId);
+        } else if (isIntegerSchemaElement(elementTail)) {
+            parseIntegerSchemaElement(elementId);
+        } else {
+            throw new ParseException(String.format("Argument: %c has invalid format: %s.", elementId, elementTail), 0);
+        }
+    }
+
+    private void validateSchemaElementId(char elementId) throws ParseException {
+        if (!Character.isLetter(elementId)) {
+            throw new ParseException("Bad Character: " + elementId + " in Args format: " + schema, 0);
+        }
+    }
+
+    private void parseBooleanSchemaElement(char elementId) throws ParseException {
+        booleanArgs.put(elementId, false);
+    }
+
+    private void parseIntegerSchemaElement(char elementId) throws ParseException {
+        intArgs.put(elementId, 0);
+    }
+
+    private void parseStringSchemaElement(char elementId) throws ParseException {
+        stringArgs.put(elementId, "");
+    }
+
+    private boolean isStringSchemaElement(String elementTail) {
+        return elementTail.equals("*");
+    }
+
+    private boolean isBooleanSchemaElement(String elementTail) {
+        return elementTail.length() == 0;
+    }
+
+    private boolean isIntegerSchemaElement(String elementTail) {
+        return elementTail.equals("#");
+    }
+
+    private boolean parseArguments() throws ArgsException {
+        for (currentArgument = 0; currentArgument < args.length; currentArgument++) {
+            String arg = args[currentArgument];
+            parseArgument(arg);
+        }
+        return true;
+    }
+
+    private void parseArgument(String arg) throws ArgsException {
+        if (arg.startsWith("-"))
+            parseElements(arg);
+    }
+
+    private void parseElements(String arg) throws ArgsException {
+        for (int i = 1; i < arg.length(); i++) {
+            parseElement(arg.charAt(i));
+        }
+    }
+
+    private void parseElement(char argChar) throws ArgsException {
+        if (setArgument(argChar)) {
+            argsFound.add(argChar);
+        } else {
+            unexpectedArguments.add(argChar);
+            errorCode = ErrorCode.UNEXPECTED_ARGUMENT;
+            valid = false;
+        }
+    }
+
+    private boolean setArgument(char argChar) throws ArgsException {
+        if (isBooleanSchemaArg(argChar)) {
+            setBooleanArg(argChar, true);
+        } else if (isStringArg(argChar)) {
+            setStringArg(argChar);
+        } else if (isIntArg(argChar)) {
+            setIntArg(argChar);
+        } else {
+            return false;
+        }
+        return true;
+    }
 }
