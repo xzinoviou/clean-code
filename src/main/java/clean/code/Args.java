@@ -26,7 +26,7 @@ public class Args {
         OK, MISSING_STRING, MISSING_INTEGER, INVALID_INTEGER, UNEXPECTED_ARGUMENT
     }
 
-    public Args(String shcema, String[] args) throws ParseException {
+    public Args(String schema, String[] args) throws ParseException {
         this.schema = schema;
         this.args = args;
         valid = parse();
@@ -187,7 +187,7 @@ public class Args {
     }
 
     private void setBooleanArg(char argChar, boolean value) {
-        booleanArgs.containsKey(argChar);
+        booleanArgs.put(argChar, value);
     }
 
     private boolean isBooleanArg(char argChar) {
