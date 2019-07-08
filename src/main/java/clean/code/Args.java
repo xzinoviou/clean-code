@@ -144,4 +144,31 @@ public class Args {
         }
         return true;
     }
+
+    private boolean isIntArg(char argChar) {
+        return intArgs.containsKey(argChar);
+    }
+
+    private void setIntArg(char argChar) throws ArgsException {
+        currentArgument++;
+        String parameter = null;
+
+        try {
+            parameter = args[currentArgument];
+            intArgs.put(argChar, new Integer(parameter));
+        } catch (ArrayIndexOutOfBoundsException e) {
+            valid = false;
+            errorArgumentId = argChar;
+            errorCode = ErrorCode.MISSING_INTEGER;
+            throw new ArgsException();
+        } catch (NumberFormatException e) {
+            valid = false;
+            errorArgumentId = argChar;
+            errorParameter = parameter;
+            errorCode = ErrorCode.INVALID_INTEGER;
+            throw new ArgsException();
+        }
+    }
+
+    
 }
